@@ -20,7 +20,6 @@ import requests
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware  # Add this for CORS support
 
-
 from langchain_community.document_loaders import PyPDFLoader, UnstructuredWordDocumentLoader, TextLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_ollama.llms import OllamaLLM
@@ -38,10 +37,10 @@ load_dotenv()
 
 
 CONFIG = {
-    "upload_dir": "./uploads",
-    "temp_dir": "./temp_results",
+    "upload_dir": "/app/uploads",
+    "temp_dir": "/app/temp_results",
     "chunk_size": int(os.getenv("CHUNK_SIZE", "1500")),  # Default to 1500 and convert to int
-    "chunk_overlap": int(os.getenv("CHUNK_OVERLAP", "150")),  # Fixed typo and default to 150
+    "chunk_overlap": int(os.getenv("CHUNK_OVERLAP", "100")),  # Fixed typo and default to 150
     "max_retries": int(os.getenv("MAX_RETRIES", "3")),
     "timeout": int(os.getenv("TIMEOUT", "60")),
     "max_requests_per_min": int(os.getenv("MAX_REQUESTS_PER_MIN", "10")),
@@ -196,8 +195,8 @@ class DatasetBuilder:
         file_extension = Path(file_path).suffix.lower()
         if file_extension == ".pdf":
             loader = PyPDFLoader(file_path)
-        elif file_extension in [".doc", ".docx"]:
-            loader = UnstructuredWordDocumentLoader(file_path)
+        # elif file_extension in [".doc", ".docx"]:
+        #     loader = UnstructuredWordDocumentLoader(file_path)
         elif file_extension == ".txt":
             loader = TextLoader(file_path)
         else:
@@ -277,11 +276,12 @@ def cleanup_old_results():
 async def read_index():
     return FileResponse('static/index.html')
 
-
+    
 # API Endpoints
 @app.post("/generate", response_model=TaskResponse)
 async def generate_synthetic_data(files: List[UploadFile] = File(...), background_tasks: BackgroundTasks = None):
-    supported_types = [".pdf", ".doc", ".docx", ".txt"]
+    # supported_types = [".pdf", ".doc", ".docx", ".txt"]
+    supported_types = [".pdf",".txt"]
     task_id = f"task_{int(time.time() * 1000)}"
     file_paths = []
 

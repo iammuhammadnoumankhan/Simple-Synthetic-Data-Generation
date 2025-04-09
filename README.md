@@ -7,11 +7,11 @@ A web-based service that generates high-quality question-answer pairs from your 
 
 ## Overview
 
-This service allows you to upload documents (PDF, DOC, DOCX, TXT) and automatically generates synthetic question-answer pairs based on the content. It's perfect for creating training data for chatbots, search engines, or other NLP applications.
+This service allows you to upload documents (PDF, TXT) and automatically generates synthetic question-answer pairs based on the content. It's perfect for creating training data for chatbots, search engines, or other NLP applications.
 
 ## Features
 
-- **Document Processing**: Upload and process PDF, DOC, DOCX, and TXT files  
+- **Document Processing**: Upload and process PDF, and TXT files  
 - **Intelligent QA Generation**: Uses Ollama LLM to create contextually relevant question-answer pairs  
 - **Quality Control**: Automatically evaluates and filters QA pairs based on quality scores  
 - **Task Management**: Track the progress of your generation tasks  
@@ -53,7 +53,7 @@ Edit the `.env` file to match your environment settings.
 
 ```bash
 docker build -t synthetic-data-generator .
-docker run -p 8000:8000 -v ./uploads:/app/uploads -v ./temp_results:/app/temp_results synthetic-data-generator
+sudo docker run -d -p 8000:8000 --name synthetic-data-container -v $(pwd)/uploads:/app/uploads -v $(pwd)/temp_results:/app/temp_results synthetic-data-service
 ```
 
 ## Configuration
