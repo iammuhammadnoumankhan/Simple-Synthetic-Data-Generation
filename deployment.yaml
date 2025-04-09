@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: synthetic-data-service
+  namespace: default
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: synthetic-data-service
+  template:
+    metadata:
+      labels:
+        app: synthetic-data-service
+    spec:
+      containers:
+      - name: synthetic-data-service
+        image: your-registry/synthetic-data-service:latest
+        ports:
+        - containerPort: 8000
+        env:
+        - name: OLLAMA_BASE_URL
+          value: "http://ollama-service:11434" # Adjust based on your Ollama service
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+        volumeMounts:
+        - name: uploads
+          mountPath: /app/uploads
+        - name: temp-results
+          mountPath: /app/temp_results
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      volumes:
+      - name: uploads
+        persistentVolumeClaim:
+          claimName: uploads-pvc
+      - name: temp-results
+        persistentVolumeClaim:
+          claimName: temp-results-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: synthetic-data-service
+  namespace: default
+spec:
+  selector:
+    app: synthetic-data-service
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8000
+  type: ClusterIP
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: uploads-pvc
+  namespace: default
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: temp-results-pvc
+  namespace: default
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
