@@ -3,7 +3,7 @@
 
 A web-based service that generates high-quality question-answer pairs from your documents using LLM technology.
 
-![Synthetic Data Generation Service](samples\sample1.png)
+![Synthetic Data Generation Service](./samples/sample1.png)
 
 ## Overview
 
